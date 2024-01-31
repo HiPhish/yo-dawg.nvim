@@ -4,8 +4,8 @@
  Yo-Dawg
 #########
 
-> Yo dawg, I heard you like Neovim, so I put a Neovim inside your Neovim so
-> you can edit while you edit.
+   Yo dawg, I heard you like Neovim, so I put a Neovim inside your Neovim so
+   you can edit while you edit.
 
 This is a thin wrapper plugin for Neovim that cuts down on the boilerplate code
 for controlling an embedded Neovim process inside Neovim.  Why would you want

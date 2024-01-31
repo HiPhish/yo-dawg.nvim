@@ -1,5 +1,8 @@
 .. default-role:: code
 
+#########
+ Yo-Dawg
+#########
 
 > Yo dawg, I heard you like Neovim, so I put a Neovim inside your Neovim so
 > you can edit while you edit.
@@ -16,8 +19,8 @@ Installation and configuration
 ##############################
 
 Install it like any other Neovim plugin.  There is no configuration, this is
-purely a library.  Personally I like to install it as an optional plugin (`:h
-:packadd`), but that's up to you.
+purely a library.  Personally I like to install it as an optional plugin
+(`:h :packadd`), but that's up to you.
 
 
 Usage

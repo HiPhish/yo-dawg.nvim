@@ -1,0 +1,111 @@
+*yo-dawg.txt*   Convenience library for controlling an embedded Neovim process
+
+                                                                     *yo-dawg*
+Author: Alejandro "HiPhish" Sanchez
+License: MIT
+Version: 1.0.0
+
+==============================================================================
+TABLE OF CONTENTS                                           *yo-dawg-contents*
+
+1. Introduction .......................................... |yo-dawg-intro|
+2. Reference ............................................. |yo-dawg-reference|
+
+
+
+==============================================================================
+INTRODUCTION                                                   *yo-dawg-intro*
+
+This is a convenience library to reduce the amount of boilerplate code when
+controlling an embedded Neovim instance.  Technically you do not need this
+plugin, and if all you need is one long-running Neovim process it probably is
+not worth pulling in a library.  However, if you have to deal with many Neovim
+process and you frequently call into the API the boilerplate can add up very
+quickly.  Consider this example:
+>lua
+    -- Start the process
+    local cmd = {'nvim', '--embed', '--headless'}
+    local nvim = vim.fn.jobstart(cmd, {rpc = true})
+
+    -- Call an API method
+    local value = vim.rpcrequest(nvim, 'nvim_eval', '1 + 2')
+
+    -- Gracefully terminate the process
+    vim.rpcnotify(nvim, 'nvim_cmd', {cmd = 'quitall', bang = true}, {})
+    vim.fn.jobwait(nvim)
+<
+Now compare it to what we get when we use Yo-Dawg:
+>lua
+    local yd = require 'yo-dawg'
+
+    -- Start the process
+    local nvim = yd.start()
+
+    -- Call an API method
+    local value = nvim:eval('1 + 2')
+
+    -- Gracefully terminate the process
+    yd.stop(nvim)
+<
+Calling the |yo-dawg.start| function returns a Neovim handle.  This a unique
+object which has all of Neovim's |API| methods as callable methods.  We have
+to explictly stop the process, or else it will linger on.
+
+
+
+==============================================================================
+REFERENCE                                                  *yo-dawg-reference*
+
+The entire library is exposed by the `yo-dawg` Lua module.
+
+
+                                                              *yo-dawg-handle*
+The handle is the main object through which we interact with Neovim.  It is a
+globally unique object which is passed by reference.  For every |API| method
+there is a corresponding handle method:
+
+• Synchronous methods have the same name as the API method without `nvim_`
+  prefix (e.g. `nvim_exec_lua` becomes `exec_lua`)
+• Asynchronous methods have the same name as the API method, but with `async_`
+  as a prefix instead of `nvim_` (e.g. `nvim_exec_lua` becomes
+  `async_exec_lua`)
+
+All methods take the same arguments as their corresponding API method.
+Synchronous methods return a value if their API method does.  Asynchronous
+methods never return any value.  Example:
+>lua
+    nvim:eval('1 + 2')                 -- Synchronous, returns 3
+    nvim:async_set_var('my_var', 124)  -- Asynchronous, side effects only
+<
+
+
+                                                               *yo-dawg.start*
+'yo-dawg'.start([{opts}])
+
+Starts a new Neovim process and returns the handle.  For the optional {opts}
+table see |jobstart-options|.  The `rpc` option is always implicitly set to
+`true` even if the {opts} say otherwise.
+
+    Parameters: ~
+        • {opts}  See |jobstart-options|; the `rpc` option is always
+                  implicitly set to `true` even if the {opts} say otherwise.
+
+    Return: ~
+        Handle to the Neovim process (|yo-dawg-handle|)
+
+
+                                                                *yo-dawg.stop*
+'yo-dawg'.stop({handle}, [{timeout}])
+
+Gracefully quits the Neovim process of {handle}.  This involves sending |:qa|
+with a bang to the process and then waiting for it to terminate.
+
+    Parameters: ~
+        • {handle}   Handle to the Neovim process (|yo-dawg-handle|)
+        • {timeout}  Same as for |jobwait()|
+
+    Return: ~
+        The same value as the first value of |jobwait()|.
+
+
+ vim:tw=78:ts=8:sw=4:et:ft=help:norl:

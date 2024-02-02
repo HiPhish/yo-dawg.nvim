@@ -94,6 +94,20 @@ table see |jobstart-options|.  The `rpc` option is always implicitly set to
         Handle to the Neovim process (|yo-dawg-handle|)
 
 
+                                                             *yo-dawg.connect*
+'yo-dawg'.connect({channel})
+
+Creates a new handle to an already running job.  You can use the function
+|yo-dawg.stop| to stop the job as if it were started by the |yo-dawg.start|
+function.
+
+    Parameters: ~
+        • {handle}  Already existing RPC |channel| of the job
+
+    Return: ~
+        Handle to the Neovim process (|yo-dawg-handle|)
+
+
                                                                 *yo-dawg.stop*
 'yo-dawg'.stop({handle}, [{timeout}])
 

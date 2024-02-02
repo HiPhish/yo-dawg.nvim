@@ -15,7 +15,7 @@ local DEFAULT_JOBOPTS = {
 ---The table has weak keys, which means entries will be removed once the
 ---corresponding key object has been garbage-collected.  We need this table
 ---because we do not want to expose the job ID to the user.
-local job_ids = setmetatable({}, {
+local channels = setmetatable({}, {
 	__mode = 'k',
 })
 
@@ -31,7 +31,7 @@ local mt = {
 		local is_async = key:find('^async_') ~= nil
 		local method = string.format('nvim_%s', key:gsub('^async_', '', 1))
 		local result = methods[key] or function(self, ...)
-			local jobid = job_ids[self]
+			local jobid = channels[self]
 			if is_async then
 				vim.rpcnotify(jobid, method, ...)
 				return
@@ -64,8 +64,15 @@ function M.start(jobopts)
 	end
 
 	local result = setmetatable({}, mt)
-	job_ids[result] = jobid
+	channels[result] = jobid
 
+	return result
+end
+
+
+function M.connect(jobid)
+	local result = setmetatable({}, mt)
+	channels[result] = jobid
 	return result
 end
 
@@ -75,14 +82,14 @@ end
 ---@param timeout integer?  Timeout in milliseconds
 ---@return integer status  Same as the first return value of jobwait()
 function M.stop(nvim, timeout)
-	local jobid = job_ids[nvim]
-	vim.rpcnotify(jobid, 'nvim_cmd', {cmd = 'quitall', bang = true}, {})
+	local channel = channels[nvim]
+	vim.rpcnotify(channel, 'nvim_cmd', {cmd = 'quitall', bang = true}, {})
 
 	local result
 	if timeout then
-		result  = vim.fn.jobwait({jobid}, timeout)
+		result  = vim.fn.jobwait({channel}, timeout)
 	else
-		result = vim.fn.jobwait({jobid})
+		result = vim.fn.jobwait({channel})
 	end
 	return result[1]
 end

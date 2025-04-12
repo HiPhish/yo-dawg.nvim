@@ -1,0 +1,3 @@
+[submodule "test/bin"]
+	path = test/bin
+	url = https://gitlab.com/HiPhish/nvim-busted-shims.git

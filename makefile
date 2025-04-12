@@ -28,7 +28,7 @@
 check: integration-test
 
 integration-test:
-	@eval $$(luarocks path --lua-version 5.1 --bin) && busted --run integration
+	@./test/bin/busted --run integration
 
 clean:
 	@rm -rf test/xdg/local/state/nvim/*

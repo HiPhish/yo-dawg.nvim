@@ -1,3 +1,6 @@
+.. SPDX-FileCopyrightText: © 2024 Alejandro "HiPhish" Sanchez
+.. SPDX-License-Identifier: CC0-1.0
+
 .. default-role:: code
 
 #########
@@ -59,10 +62,12 @@ It's done as far as I am concerned.  It does one thing and does it well.
 License
 #######
 
-Licensed under the terms of the MIT (Expat) license.  See the LICENSE_ file for
+The source code is licensed under the terms of the MIT (Expat) license, the
+documentation is licensed under the terms of the CC0-1.0 license, the tests are
+licensed under the terms of the Unlicense.  See the LICENSES_ directory for
 details.
 
 
 .. _Busted: https://lunarmodules.github.io/busted/
 .. _Selenium: https://www.selenium.dev/
-.. _LICENSE: LICENSE.txt
+.. _LICENSES: LICENSE.txt

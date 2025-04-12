@@ -1,3 +1,4 @@
+-- SPDX-FileCopyrightText: © 2024 Alejandro "HiPhish" Sanchez
 -- SPDX-License-Identifier: MIT
 
 local M = {}

@@ -1,4 +1,5 @@
--- SPDX-License-Identifier: MIT
+-- SPDX-FileCopyrightText: © 2024 Alejandro "HiPhish" Sanchez
+-- SPDX-License-Identifier: Unlicense
 
 local yd = require 'yo-dawg'
 

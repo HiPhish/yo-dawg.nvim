@@ -85,7 +85,11 @@ methods never return any value.  Example:
 
 Starts a new Neovim process and returns the handle.  For the optional {opts}
 table see |jobstart-options|.  The `rpc` option is always implicitly set to
-`true` even if the {opts} say otherwise.
+`true` even if the {opts} say otherwise. 
+
+It uses the |v:progpath| of the current Neovim process as the Neovim binary to
+execute.  This is useful if you have multiple Neovim binaries installed on
+your system.
 
     Parameters: ~
         • {opts}  See |jobstart-options|; the `rpc` option is always

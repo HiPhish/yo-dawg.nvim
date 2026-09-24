@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: © 2024 Alejandro "HiPhish" Sanchez
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: 0BSD
 
 .PHONY: check integration-test clean
 

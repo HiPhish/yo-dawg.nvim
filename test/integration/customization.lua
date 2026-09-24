@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: Unlicense
+-- SPDX-License-Identifier: 0BSD
 -- SPDX-FileCopyrightText: © 2026 HiPhish
 
 local yd = require 'yo-dawg'

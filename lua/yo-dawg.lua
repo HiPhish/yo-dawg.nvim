@@ -27,7 +27,7 @@ local methods = {
 
 
 ---Metatable of all Neovim instances
-local mt = {
+local nvim_mt = {
 	---Allows API methods over RPC as if they were methods of the object.  The
 	---`key` is translated to an API method name by prepending `nvim_`.
 	__index = function(nvim, key)
@@ -48,6 +48,28 @@ local mt = {
 		return result
 	end
 }
+
+---The actual implementation of the `start` function.
+---@param cmd string[]  The command to execute
+---@param jobopts table?  Optional job options
+local function start(cmd, jobopts)
+	jobopts = jobopts or DEFAULT_JOBOPTS
+	jobopts.rpc = true
+	local jobid = vim.fn.jobstart(cmd, jobopts)
+
+	if jobid == 0 then
+		local msg = INV_ARGS_TEMPLATE:format(vim.inspect(jobopts))
+		error(msg)
+	elseif jobid == -1 then
+		local msg = INV_CMD_TEMPLATE:format(cmd[1])
+		error(msg)
+	end
+
+	local result = setmetatable({}, nvim_mt)
+	channels[result] = jobid
+
+	return result
+end
 
 
 ---Starts a new Neovim process, returns the handle.
@@ -84,28 +106,70 @@ local mt = {
 ---@param jobopts table?  Optional job options
 ---@return table neovim  The remote Neovim instance object
 function M.start(jobopts)
-	jobopts = jobopts or DEFAULT_JOBOPTS
-	jobopts.rpc = true
-	local jobid = vim.fn.jobstart(COMMAND, jobopts)
-
-	if jobid == 0 then
-		local msg = INV_ARGS_TEMPLATE:format(vim.inspect(jobopts))
-		error(msg)
-	elseif jobid == -1 then
-		local msg = INV_CMD_TEMPLATE:format(COMMAND[1])
-		error(msg)
-	end
-
-	local result = setmetatable({}, mt)
-	channels[result] = jobid
-
-	return result
+	return start(COMMAND, jobopts)
 end
 
 
 function M.connect(jobid)
-	local result = setmetatable({}, mt)
+	local result = setmetatable({}, nvim_mt)
 	channels[result] = jobid
+	return result
+end
+
+
+---@param self table  The base Yo-Dawg table
+---@param cmd string[]  The command to start a new Neovim process
+function M.with_cmd(self, cmd)
+	local result = {
+		---The command to start a new Neovim process
+		cmd = cmd,
+		---Starts a new Neovim process, returns the handle.
+		---
+		---The job options are the same as for the Vim function `jobstart`, except that
+		---`rpc` will always be forced on.  The result is a Lua object which acts as a
+		---proxy to the remote Neovim process.  We can call Neovim API methods as if
+		---they were methods of this object.  Example:
+		---
+		---```lua
+		----- Evaluate a Vim script expression
+		---local result = nvim:eval('1 + 2')
+		----- Call an asynchronous method (does not wait for a result)
+		---nvim:async_set_var('my_var', result)
+		----- Only synchronous methods can return values
+		---local my_var = nvim:get_var('my_var')
+		---```
+		---
+		---The remote process must be explicitly closed by calling the `stop` function,
+		---otherwise the remote process will not be cleaned up, causing a resource
+		---leak.
+		---
+		---```lua
+		---local yd = require 'yo-dawg'
+		---
+		---nvim = yd.start()
+		----- Wrap the call to make sure we clean up even if an error is thrown
+		---pcall(function()
+		---    print(nvim:eval('1 + 2'))
+		---end)
+		---yd.stop(nvim)
+		---```
+		---
+		---@param jobopts table?  Optional job options
+		---@return table neovim  The remote Neovim instance object
+		start = function (jobopts)
+			return start(cmd, jobopts)
+		end,
+	}
+	local mt = {
+		__index = function (table, key)
+			local value = rawget(table, key)
+			if value ~= nil then
+				return value
+			end
+			return self[key]
+		end
+	}
+	setmetatable(result, mt)
 	return result
 end
 

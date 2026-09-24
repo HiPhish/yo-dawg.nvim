@@ -127,4 +127,31 @@ with a bang to the process and then waiting for it to terminate.
         The same value as the first value of |jobwait()|.
 
 
+
+                                                            *yo-dawg.with_cmd*
+'yo-dawg':with_cmd({cmd})
+
+Instantiate a new Yo-Dawg module which inherits all the keys from the parent
+table, except that the `start` function will use `cmd` to launch Neovim.
+
+Note: this must be called as a method, not a regular function.
+
+    Parameters: ~
+        • {cmd}  Sequence of strings, the command to start a new Neovim
+                 process
+
+    Return: ~
+        Table with the same keys as the table the method was called on, except
+        that |yo-dawg.start| will use {cmd} instead of a default command.
+
+Example: >lua
+    -- Starts Neovim with a file already open
+    local custom_yd = require('yo_dawg'):with_cmd {
+        'nvim', '--embed', '--headless', 'init.lua'
+    }
+
+    local nvim = custom_yd.start()
+<
+
+
  vim:tw=78:ts=8:sw=4:et:ft=help:norl:
